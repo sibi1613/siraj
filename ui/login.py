@@ -1,5 +1,9 @@
 import customtkinter as ctk
 
+from tkinter import messagebox
+from controllers.user_controller import get_user
+from utils.security import verify_password
+
 
 class LoginWindow(ctk.CTk):
     def __init__(self):
@@ -83,8 +87,23 @@ class LoginWindow(ctk.CTk):
         username = self.username_entry.get()
         password = self.password_entry.get()
 
-        print("Username:", username)
-        print("Password:", password)
+        if username == "" or password == "":
+            messagebox.showerror("Error", "Please enter username and password")
+            return
+
+        user = get_user(username)
+
+        if verify_password(password, user["password"]):
+            from ui.dashboard import DashboardWindow
+
+            self.destroy()
+
+            dashboard = DashboardWindow()
+            dashboard.mainloop()
+
+        else:
+            messagebox.showerror("Error", "Incorrect Password")
+        
 
     def open_register(self):
         from ui.register import RegisterWindow

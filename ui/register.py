@@ -1,5 +1,9 @@
 import customtkinter as ctk
 
+from tkinter import messagebox
+from controllers.user_controller import create_user
+from utils.security import hash_password
+
 
 class RegisterWindow(ctk.CTk):
 
@@ -71,7 +75,8 @@ class RegisterWindow(ctk.CTk):
             self.register_frame,
             text="Register",
             width=300,
-            height=40
+            height=40,
+            command=self.register
         )
         self.register_button.pack(pady=(20,10))
 
@@ -93,3 +98,25 @@ class RegisterWindow(ctk.CTk):
 
         login_window = LoginWindow()
         login_window.mainloop()
+
+    def register(self):
+        username = self.username_entry.get()
+        password = self.password_entry.get()
+        confirm_password = self.confirm_password_entry.get()
+
+        if username == "" or password == "" or confirm_password == "":
+            messagebox.showerror("Error", "Please fill all fields")
+            return
+
+        if password != confirm_password:
+            messagebox.showerror("Error", "Passwords do not match")
+            return
+
+        hashed_password = hash_password(password)
+
+        success = create_user(username, hashed_password)
+
+        if success:
+            messagebox.showinfo("Success", "Registration Successful!")
+        else:
+            messagebox.showerror("Error", "Username already exists!")
